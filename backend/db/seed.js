@@ -110,6 +110,10 @@ async function seed() {
       );
     }
 
+    await connection.query(
+      "UPDATE quick_links SET url = '/erp-learning-hub' WHERE title = 'ERP Learning Hub'"
+    );
+
     // --- Document groups + documents --------------------------------------------------
     const [[{ count: groupCount }]] = await connection.query('SELECT COUNT(*) AS count FROM document_groups');
     if (groupCount === 0) {

@@ -29,6 +29,14 @@ test('login returns a token and dashboard loads for authenticated users', async 
     const dashboard = await dashboardRes.json();
     assert.equal(dashboard.profile.service_no, '6609');
     assert.ok(Array.isArray(dashboard.quick_links));
+
+    const hubRes = await fetch(`http://127.0.0.1:${port}/api/erp-learning-hub`, {
+      headers: { Authorization: `Bearer ${loginData.token}` },
+    });
+    assert.equal(hubRes.status, 200);
+    const hub = await hubRes.json();
+    assert.equal(hub.title, 'ERP Learning Hub');
+    assert.ok(Array.isArray(hub.sections));
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

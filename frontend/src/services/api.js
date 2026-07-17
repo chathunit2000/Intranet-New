@@ -47,4 +47,9 @@ export async function fetchAttendanceHistory(page = 1) {
   return data;
 }
 
+export async function fetchErpLearningHub() {
+  const { data } = await api.get('/erp-learning-hub');
+  return data;
+}
+
 export default api;

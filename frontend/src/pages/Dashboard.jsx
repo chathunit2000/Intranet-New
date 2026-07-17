@@ -8,7 +8,11 @@ export default function Dashboard({ onLoggedOut, onNavigate }) {
   useEffect(() => {
     fetchDashboard()
       .then(setData)
-      .catch(() => setError("Could not load your dashboard. Please try again."));
+      .catch((err) => {
+        console.error('Dashboard load failed:', err);
+        const message = err.response?.data?.message || err.message || "Could not load your dashboard. Please try again.";
+        setError(`Could not load your dashboard. ${message}`);
+      });
   }, []);
 
   if (error) return <div className="dashboard">{error}</div>;
