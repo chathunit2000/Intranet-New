@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login } from "../services/api";
 
 export default function Login({ onSuccess }) {
-  const [serviceNo, setServiceNo] = useState("");
+  const [ssn, setSSN] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -11,12 +11,13 @@ export default function Login({ onSuccess }) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      await login(serviceNo, password);
+      await login(ssn, password);
       onSuccess();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Invalid service number or password"
+        err.response?.data?.message || "Invalid SSN or password"
       );
     } finally {
       setLoading(false);
@@ -38,13 +39,16 @@ export default function Login({ onSuccess }) {
         style={{ width: 320 }}
       >
         <h3>Intranet Login</h3>
+
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            Service No
+            SSN
           </label>
+
           <input
-            value={serviceNo}
-            onChange={(e) => setServiceNo(e.target.value)}
+            type="number"
+            value={ssn}
+            onChange={(e) => setSSN(e.target.value)}
             required
             style={{
               width: "100%",
@@ -57,10 +61,12 @@ export default function Login({ onSuccess }) {
             }}
           />
         </div>
+
         <div style={{ marginBottom: 16 }}>
           <label style={{ fontSize: 12, color: "var(--text-muted)" }}>
             Password
           </label>
+
           <input
             type="password"
             value={password}
@@ -77,18 +83,26 @@ export default function Login({ onSuccess }) {
             }}
           />
         </div>
+
         {error && (
-          <div style={{ color: "var(--red-1)", fontSize: 12, marginBottom: 10 }}>
+          <div
+            style={{
+              color: "var(--red-1)",
+              fontSize: 12,
+              marginBottom: 10,
+            }}
+          >
             {error}
           </div>
         )}
+
         <button
           type="submit"
           disabled={loading}
           className="btn-link"
           style={{ width: "100%" }}
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
     </div>

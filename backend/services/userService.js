@@ -1,30 +1,46 @@
 const pool = require('../db/pool');
 
-async function findUserByServiceNo(serviceNo) {
+// Find user by SSN (used during login)
+async function findUserBySSN(ssn) {
   const [rows] = await pool.query(
-    `SELECT u.id, u.employee_id, u.service_no, u.password_hash, u.must_change_password,
-            e.full_name, e.division, e.salary_scale, e.pass_no, e.employment_type, e.status, e.avatar_path
-     FROM users u
-     JOIN employees e ON e.id = u.employee_id
-     WHERE u.service_no = ?`,
-    [serviceNo]
+    `
+    SELECT
+      userID,
+      SSN,
+      password,
+      userType,
+      empName,
+      division_id
+    FROM tbllogin2
+    WHERE SSN = ?
+    `,
+    [ssn]
   );
+
   return rows[0] || null;
 }
 
+// Find user by ID (used after login/auth middleware)
 async function findUserById(userId) {
   const [rows] = await pool.query(
-    `SELECT u.id, u.employee_id, u.service_no, u.password_hash, u.must_change_password,
-            e.full_name, e.division, e.salary_scale, e.pass_no, e.employment_type, e.status, e.avatar_path
-     FROM users u
-     JOIN employees e ON e.id = u.employee_id
-     WHERE u.id = ?`,
+    `
+    SELECT
+      userID,
+      SSN,
+      password,
+      userType,
+      empName,
+      division_id
+    FROM tbllogin2
+    WHERE userID = ?
+    `,
     [userId]
   );
+
   return rows[0] || null;
 }
 
 module.exports = {
-  findUserByServiceNo,
+  findUserBySSN,
   findUserById,
 };

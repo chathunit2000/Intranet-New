@@ -69,7 +69,7 @@ async function getErpLearningHubData(user) {
     subtitle: 'Your centralized ERP learning and support center',
     support_extension: '5566',
     alert:
-      'Above mentioned employee information are not accurate and must be verified by the HR Division.',
+      'Above mentioned employee information are not accurate and those are to be checked and verified by the HR Division.',
     quote: 'Continuous learning is the key to growth across every business process.',
     sections: [
       {

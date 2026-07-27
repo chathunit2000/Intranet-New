@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
+
 
 const DEFAULT_SERVICE_NO = process.env.INTRANET_SERVICE_NO || '6609';
 const DEFAULT_PASSWORD = process.env.INTRANET_PASSWORD || '6609';
@@ -35,13 +35,34 @@ async function seed() {
       employeeId = result.insertId;
     }
 
-    const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
-    await connection.query(
-      `INSERT INTO users (employee_id, service_no, password_hash, must_change_password)
-       VALUES (?, ?, ?, 0)
-       ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
-      [employeeId, DEFAULT_SERVICE_NO, passwordHash]
-    );
+    // -------------------- Login User (tbllogin2) --------------------
+const [existingLogin] = await connection.query(
+  'SELECT userID FROM tbllogin2 WHERE SSN = ?',
+  [DEFAULT_SERVICE_NO]
+);
+
+if (existingLogin.length === 0) {
+  await connection.query(
+    `
+    INSERT INTO tbllogin2
+    (
+      SSN,
+      password,
+      userType,
+      empName,
+      division_id
+    )
+    VALUES (?, ?, ?, ?, ?)
+    `,
+    [
+      DEFAULT_SERVICE_NO,
+      '',                 // Password column not used
+      1,                  // Change to the correct user type if needed
+      'A.B.C.Perera',
+      1                   // Change to the correct division ID if needed
+    ]
+  );
+}
 
     // --- Today's attendance -----------------------------------------------------
     const today = new Date().toISOString().slice(0, 10);

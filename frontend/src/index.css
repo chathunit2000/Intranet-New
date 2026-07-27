@@ -262,48 +262,96 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.hub-grid {
+.erp-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
   margin-bottom: 16px;
 }
 
-.section-card {
+.erp-tab {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--navy-900);
+  color: var(--text-muted);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.erp-tab:hover {
+  color: var(--text-light);
+}
+
+.erp-tab.active {
+  background: linear-gradient(90deg, var(--teal), #3bcbe4);
+  border-color: transparent;
+  color: white;
+}
+
+.hub-panel {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.hub-panel-header h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+}
+
+.hub-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.hub-link {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.section-items {
-  display: grid;
-  gap: 12px;
-}
-
-.section-item {
-  display: block;
-  padding: 14px 16px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   background: var(--navy-900);
   color: var(--text-light);
   text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.section-item strong {
+.hub-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.hub-link strong {
   display: block;
+  font-size: 14px;
   margin-bottom: 6px;
 }
 
-.section-item p {
+.hub-link p {
   margin: 0;
-  font-size: 13px;
   color: var(--text-muted);
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.hub-link-arrow {
+  align-self: flex-end;
+  font-size: 18px;
+  color: var(--teal);
 }
 
 @media (max-width: 900px) {
-  .hub-grid { grid-template-columns: 1fr; }
+  .erp-tabs {
+    grid-template-columns: 1fr;
+  }
+  .hub-panel-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .page-title {

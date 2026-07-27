@@ -23,11 +23,13 @@ api.interceptors.response.use(
   }
 );
 
-export async function login(serviceNo, password) {
+// Login using SSN
+export async function login(ssn, password) {
   const { data } = await api.post("/login", {
-    service_no: serviceNo,
+    ssn,
     password,
   });
+
   localStorage.setItem("token", data.token);
   return data;
 }
@@ -48,7 +50,7 @@ export async function fetchAttendanceHistory(page = 1) {
 }
 
 export async function fetchErpLearningHub() {
-  const { data } = await api.get('/erp-learning-hub');
+  const { data } = await api.get("/erp-learning-hub");
   return data;
 }
 
