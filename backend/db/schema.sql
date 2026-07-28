@@ -1,0 +1,81 @@
+-- Intranet database schema
+-- Run via: npm run db:migrate
+
+CREATE TABLE IF NOT EXISTS employees (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  service_no VARCHAR(20) NOT NULL UNIQUE,
+  full_name VARCHAR(150) NOT NULL,
+  division VARCHAR(100),
+  salary_scale VARCHAR(20),
+  pass_no VARCHAR(30),
+  employment_type VARCHAR(30),
+  status VARCHAR(20) DEFAULT 'Active',
+  avatar_path VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  employee_id INT NOT NULL,
+  service_no VARCHAR(20) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  must_change_password TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS attendances (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  employee_id INT NOT NULL,
+  work_date DATE NOT NULL,
+  check_in TIME,
+  check_out TIME,
+  status VARCHAR(20) DEFAULT 'Present',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_employee_day (employee_id, work_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS updates (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(150) NOT NULL,
+  icon VARCHAR(50),
+  color VARCHAR(30),
+  sort_order INT DEFAULT 0,
+  is_new TINYINT(1) DEFAULT 0,
+  is_active TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS pending_actions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  employee_id INT NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  link_url VARCHAR(255) DEFAULT '#',
+  is_resolved TINYINT(1) DEFAULT 0,
+  FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS quick_links (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(150) NOT NULL,
+  icon VARCHAR(50),
+  url VARCHAR(255) DEFAULT '#',
+  sort_order INT DEFAULT 0,
+  is_active TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS document_groups (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(150) NOT NULL,
+  sort_order INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS documents (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  group_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  sort_order INT DEFAULT 0,
+  FOREIGN KEY (group_id) REFERENCES document_groups(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
