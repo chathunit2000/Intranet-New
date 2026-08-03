@@ -5,14 +5,24 @@ async function findUserBySSN(ssn) {
   const [rows] = await pool.query(
     `
     SELECT
-      userID,
-      SSN,
-      password,
-      userType,
-      empName,
-      division_id
-    FROM tbllogin2
-    WHERE SSN = ?
+      t.userID,
+      t.SSN,
+      t.password,
+      t.userType,
+      t.empName,
+      t.division_id,
+      e.id AS employee_id,
+      e.service_no,
+      e.full_name,
+      e.division,
+      e.salary_scale,
+      e.pass_no,
+      e.employment_type,
+      e.status,
+      e.avatar_path
+    FROM tbllogin2 AS t
+    LEFT JOIN employees AS e ON e.service_no = t.SSN
+    WHERE t.SSN = ?
     `,
     [ssn]
   );
@@ -25,14 +35,24 @@ async function findUserById(userId) {
   const [rows] = await pool.query(
     `
     SELECT
-      userID,
-      SSN,
-      password,
-      userType,
-      empName,
-      division_id
-    FROM tbllogin2
-    WHERE userID = ?
+      t.userID,
+      t.SSN,
+      t.password,
+      t.userType,
+      t.empName,
+      t.division_id,
+      e.id AS employee_id,
+      e.service_no,
+      e.full_name,
+      e.division,
+      e.salary_scale,
+      e.pass_no,
+      e.employment_type,
+      e.status,
+      e.avatar_path
+    FROM tbllogin2 AS t
+    LEFT JOIN employees AS e ON e.service_no = t.SSN
+    WHERE t.userID = ?
     `,
     [userId]
   );

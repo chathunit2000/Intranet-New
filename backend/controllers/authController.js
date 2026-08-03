@@ -24,12 +24,29 @@ async function login(req, res) {
     });
   }
 
-  const validPassword = bcrypt.compareSync(password, user.password);
+  let validPassword = false;
+  if (user.password) {
+    validPassword = bcrypt.compareSync(password, user.password);
+  } else if (password === String(user.SSN)) {
+    validPassword = true;
+  }
 
   if (!validPassword) {
     return res.status(401).json({
       message: 'Invalid SSN or password'
     });
+  }
+
+  if (!user.password && password === String(user.SSN)) {
+    const passwordHash = bcrypt.hashSync(password, 10);
+    await pool.query(
+      `
+      UPDATE tbllogin2
+      SET password = ?
+      WHERE userID = ?
+      `,
+      [passwordHash, user.userID]
+    );
   }
 
   const token = jwt.sign(

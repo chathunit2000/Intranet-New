@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ItPolicies from "./pages/ItPolicies";
 import ErpLearningHub from "./pages/ErpLearningHub";
+import AttendanceReport from "./pages/AttendanceReport";
 import "./index.css";
 
 export default function App() {
@@ -17,6 +18,8 @@ export default function App() {
     <ItPolicies onBack={() => setPage("dashboard")} />
   ) : page === "erp-learning-hub" ? (
     <ErpLearningHub onBack={() => setPage("dashboard")} />
+  ) : page === "attendance" ? (
+    <AttendanceReport onBack={() => setPage("dashboard")} />
   ) : (
     <Dashboard
       onLoggedOut={() => {
