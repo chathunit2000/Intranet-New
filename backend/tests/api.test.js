@@ -14,7 +14,7 @@ test('login returns a token and dashboard loads for authenticated users', async 
     const loginRes = await fetch(`http://127.0.0.1:${port}/api/login`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ service_no: '6609', password: '6609' }),
+      body: JSON.stringify({ ssn: '6609', password: '6609' }),
     });
 
     assert.equal(loginRes.status, 200);

@@ -1,5 +1,55 @@
 import { useEffect, useState } from "react";
 import { fetchDashboard, logout } from "../services/api";
+import {
+  Globe,
+  Mail,
+  Lock,
+  Monitor,
+  FolderOpen,
+  Presentation,
+  Headphones,
+  ShieldCheck,
+  Phone,
+  Briefcase,
+  MessageSquare,
+  LogIn,
+  UserCog,
+  CalendarCheck,
+  Car,
+  Megaphone,
+  Settings,
+  BookOpen,
+  Link as LinkIcon,
+} from "lucide-react";
+
+// Ordered [keyword, Icon] pairs — first match wins, so put more specific
+// keywords (e.g. "user credential") before broader ones (e.g. "user").
+const ICON_RULES = [
+  [/aasl web/, Globe],
+  [/office.*mail|e-?mail/, Mail],
+  [/password/, Lock],
+  [/help desk/, Monitor],
+  [/ftp/, FolderOpen],
+  [/civil aviation|training/, Presentation],
+  [/it services/, Headphones],
+  [/it polic/, ShieldCheck],
+  [/directory/, Phone],
+  [/procurement/, Briefcase],
+  [/complaint/, MessageSquare],
+  [/silk route|login/, LogIn],
+  [/credential/, UserCog],
+  [/leave management/, CalendarCheck],
+  [/vehicle/, Car],
+  [/tenderboard/, Megaphone],
+  [/erp/, Settings],
+  [/knowledge/, BookOpen],
+];
+
+function iconForLink(title = "") {
+  const t = title.toLowerCase();
+  const match = ICON_RULES.find(([pattern]) => pattern.test(t));
+  return match ? match[1] : LinkIcon;
+}
 
 export default function Dashboard({ onLoggedOut, onNavigate }) {
   const [data, setData] = useState(null);
@@ -26,7 +76,7 @@ export default function Dashboard({ onLoggedOut, onNavigate }) {
 
       <div className="top-grid">
         <ProfileCard profile={profile} />
-        <AttendanceCard attendance={attendance_today} />
+        <AttendanceCard attendance={attendance_today} onNavigate={onNavigate} />
         <UpdatesCard updates={updates} pending={pending_actions} />
       </div>
 
@@ -92,7 +142,12 @@ function ProfileCard({ profile }) {
   );
 }
 
-function AttendanceCard({ attendance }) {
+function AttendanceCard({ attendance, onNavigate }) {
+  const handleViewReports = (event) => {
+    event.preventDefault();
+    onNavigate?.("attendance");
+  };
+
   return (
     <div className="card">
       <h3>Recent Attendance</h3>
@@ -111,7 +166,9 @@ function AttendanceCard({ attendance }) {
       <p className="attendance-note">
         You will be able to check your Daily Attendance Reports by clicking below.
       </p>
-      <a className="btn-link" href="#">View Daily Attendance Reports</a>
+      <a className="btn-link" href="/attendance" onClick={handleViewReports}>
+        View Daily Attendance Reports
+      </a>
     </div>
   );
 }
@@ -140,6 +197,7 @@ function QuickLinksStrip({ links, onNavigate }) {
       {links.map((l) => {
         const isExternal = l.url?.startsWith("http");
         const isInternal = l.url?.startsWith("/");
+        const Icon = iconForLink(l.title);
         return (
           <a
             key={l.id}
@@ -152,7 +210,7 @@ function QuickLinksStrip({ links, onNavigate }) {
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noreferrer" : undefined}
           >
-            <div className="link-icon">•</div>
+            <div className="link-icon"><Icon size={18} /></div>
             {l.title}
           </a>
         );

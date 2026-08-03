@@ -1,9 +1,9 @@
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 
-
 const DEFAULT_SERVICE_NO = process.env.INTRANET_SERVICE_NO || '6609';
-const DEFAULT_PASSWORD = process.env.INTRANET_PASSWORD || '6609';
+const DEFAULT_PASSWORD = process.env.INTRANET_PASSWORD || DEFAULT_SERVICE_NO;
 
 async function seed() {
   const connection = await mysql.createConnection({
@@ -35,34 +35,32 @@ async function seed() {
       employeeId = result.insertId;
     }
 
-    // -------------------- Login User (tbllogin2) --------------------
-const [existingLogin] = await connection.query(
-  'SELECT userID FROM tbllogin2 WHERE SSN = ?',
-  [DEFAULT_SERVICE_NO]
-);
+    // --- Login user for tbllogin2 ---------------------------------------------
+    const passwordHash = bcrypt.hashSync(DEFAULT_PASSWORD, 10);
+    const [existingLogin] = await connection.query(
+      'SELECT userID, password FROM tbllogin2 WHERE SSN = ?',
+      [DEFAULT_SERVICE_NO]
+    );
 
-if (existingLogin.length === 0) {
-  await connection.query(
-    `
-    INSERT INTO tbllogin2
-    (
-      SSN,
-      password,
-      userType,
-      empName,
-      division_id
-    )
-    VALUES (?, ?, ?, ?, ?)
-    `,
-    [
-      DEFAULT_SERVICE_NO,
-      '',                 // Password column not used
-      1,                  // Change to the correct user type if needed
-      'A.B.C.Perera',
-      1                   // Change to the correct division ID if needed
-    ]
-  );
-}
+    if (existingLogin.length === 0) {
+      await connection.query(
+        `
+        INSERT INTO tbllogin2
+          (SSN, password, userType, empName, division_id)
+        VALUES (?, ?, ?, ?, ?)
+        `,
+        [DEFAULT_SERVICE_NO, passwordHash, 1, 'A.B.C.Perera', 1]
+      );
+    } else if (!existingLogin[0].password) {
+      await connection.query(
+        `
+        UPDATE tbllogin2
+        SET password = ?
+        WHERE userID = ?
+        `,
+        [passwordHash, existingLogin[0].userID]
+      );
+    }
 
     // --- Today's attendance -----------------------------------------------------
     const today = new Date().toISOString().slice(0, 10);
@@ -139,9 +137,10 @@ if (existingLogin.length === 0) {
     const [[{ count: groupCount }]] = await connection.query('SELECT COUNT(*) AS count FROM document_groups');
     if (groupCount === 0) {
       const groups = [
-        { title: 'Company Medical Scheme Documents', docs: ['Benefit Schedule 2025/2026', 'Tests Price List of Medical Check up Packages 2025/2026'] },
+        { title: 'Company Medical Scheme Documents', docs: ['Benefit Schedule 2025/2026', 'Tests Price List of Medical Check up Packages 2025/2026', 'Approved/Blacklisted Hospitals Under AASL Medical Scheme','List of Cordinaters for medical Checkup','Applications-Enrollment', 'Application-Inclusion of Depenedents', 'Request-Hospital Admissions','Request-Medical Checkup', 'Claim form- Indoor', 'Claim form- Outdoor', 'Claim form- Transport'] },
         { title: 'Annual Action Plan / Procurement / Tender Board', docs: ['Annual Action Plan 2025', 'Master Procurement Plan', 'Tender Board'] },
-        { title: 'Documentation', docs: ['News Letter - RUNWAY', 'BIA Destination Green'] },
+        { title: 'Documentation', docs: ['News Letter - RUNWAY', 'BIA Destination Green','PMDS Formats','Software Help Desk'] },
+
       ];
 
       for (let i = 0; i < groups.length; i += 1) {
@@ -155,7 +154,6 @@ if (existingLogin.length === 0) {
     }
 
     console.log('Seed complete.');
-    console.log(`Demo login -> service_no: ${DEFAULT_SERVICE_NO}, password: ${DEFAULT_PASSWORD}`);
   } finally {
     await connection.end();
   }
